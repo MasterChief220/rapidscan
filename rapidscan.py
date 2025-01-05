@@ -1354,6 +1354,7 @@ def get_parser():
     parser.add_argument('-n', '--nospinner', action='store_true', 
                         help='Disable the idle loader/spinner.')
     parser.add_argument('target', nargs='?', metavar='URL', help='URL to scan.', default='', type=str)
+    parser.add_argument('-l', '--list', metavar='FILE', help='File containing a list of URLs to scan.', type=str) 
     return parser
 
 
@@ -1399,6 +1400,17 @@ if len(sys.argv) == 1:
     sys.exit(1)
 
 args_namespace = get_parser().parse_args()
+
+if args_namespace.list:
+    try:
+        with open(args_namespace.list, 'r') as file:
+            target_list = [line.strip() for line in file if line.strip()]
+    except FileNotFoundError:
+        print(bcolors.BG_ERR_TXT + "Error: File not found. Please check the file path." + bcolors.ENDC)
+        sys.exit(1)
+else:
+    target_list = [args_namespace.target] if args_namespace.target else []
+
 
 if args_namespace.nospinner:
     spinner.disabled = True
